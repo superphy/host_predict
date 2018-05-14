@@ -2,6 +2,7 @@ from Bio import SeqIO
 import sys
 import lmdb
 import zarr
+import numpy as np
 
 def print_env(env):
 	"""
@@ -43,3 +44,16 @@ if __name__ == "__main__":
 
 	#print_env(rowenv)
 	#print_env(colenv)
+
+	# Open row and col environments for index lookup.
+	#rowenv = lmdb.Environment(b'rowdb', max_dbs=100, map_size=5000000000)
+	#colenv = lmdb.Environment(b'coldb', max_dbs=100, map_size=5000000000)
+
+	# Find the total number of rows and columns for creating the .zarr matrix.
+	numrows = rowenv.stat()['entries']
+	numrows = int(numrows)
+	numcols = colenv.stat()['entries']
+	numcols = int(numcols)
+
+	kmermatrix = np.zeros((numrows,numcols))
+	np.save('kmermatrix.npy', kmermatrix)

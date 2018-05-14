@@ -1,6 +1,6 @@
 configfile: "config.yaml"
 
-ruleorder: all > kmer_count > fa_dump > make_master > update_master > make_zarr
+ruleorder: all > kmer_count > fa_dump > make_master > update_master > make_matrix
 
 rule all:
   input:
@@ -39,8 +39,10 @@ rule make_master:
 
 rule update_master: 
   input:
-    "touch/human/.h-ECI-0008"
+    #"touch/human/.h-ECI-0008"
     #"touch/{species}/.{sample}"
+    expand("touch/human/.{human_samples}", human_samples=config["human_samples"]),
+    expand("touch/bovine/.{bovine_samples}", bovine_samples=config["bovine_samples"])
   output:
     #"touch/touch/{species}/.{sample}"
     touch("touch/touchfile")
@@ -48,7 +50,7 @@ rule update_master:
     "python updatemaster.py"
 
 
-rule make_zarr: 
+rule make_matrix: 
   input:
     a = "results/{species}/{sample}.fa",
     #b = "touch/touch/{species}/.{sample}",
