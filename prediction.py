@@ -8,12 +8,14 @@ import lmdb
 
 if __name__ == "__main__":
 	"""
-	Note this script is for the specific given input, will have to be changed if original data is altered.
-
+	Notes
+		-this script is for the specific given input, will have to be changed if original data is altered.
+		-should rotate the testing and training sets
+		
 	Resources:
-	SVM: http://scikit-learn.org/stable/modules/svm.html
-		 http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
-	MLP: http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html#sklearn.neural_network.MLPClassifier
+		SVM: http://scikit-learn.org/stable/modules/svm.html
+			 http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
+		MLP: http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html#sklearn.neural_network.MLPClassifier
 	"""
 
 	# Load the data
