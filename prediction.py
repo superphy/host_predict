@@ -11,7 +11,8 @@ if __name__ == "__main__":
 	Notes
 		-this script is for the specific given input, will have to be changed if original data is altered.
 		-should rotate the testing and training sets
-		
+		-could use a mask to create the training and testing sets, instead of iterating through
+
 	Resources:
 		SVM: http://scikit-learn.org/stable/modules/svm.html
 			 http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
