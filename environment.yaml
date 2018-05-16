@@ -113,4 +113,3 @@ dependencies:
   - python-gflags=3.1.2=py36_0
   - scipy=1.0.1=py36hfc37229_0
 prefix: /home/jan/miniconda3/envs/kmer
-
