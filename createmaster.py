@@ -23,37 +23,45 @@ def print_env(env):
 	
 
 def create_master(rowenv,colenv):
+	"""
+	Create databases (lmdb) for row and column indices for the matrix
+	"""
 	p = Path('./results')
 	rowindex = 0
+	# For each fasta file in the results
 	for filename in p.iterdir():
 		# Get the genomeid from the filepath
 		genomeid = os.path.basename(filename)
-
 		# Fill in the row environment.
 		with rowenv.begin(write=True) as txn:
-			# key = GenomeID & value = row index
-			# Note that files passed in alphabetical order
+			# key = GenomeID & value = row index; note that files
+			# are passed in alphabetical order, so we can add the
+			# index as we go.
 			strindex = str(rowindex)
 			txn.put(genomeid.encode('ascii'), strindex.encode('ascii'), overwrite=True)
 			rowindex+=1
-
-		# Fill in the colenv
-		with colenv.begin(write=True) as txn:
-			for record in SeqIO.parse(filename, "fasta"):
-				# Add the sequence as the key. Initially the value is 0.
-				# Files aren't given to this script in alphabetical order,
-				# so the value (col#) will be input later (updatemaster.py)
-				kmerseq = record.seq
-				kmerseq = kmerseq._get_seq_str_and_check_alphabet(kmerseq)
-				txn.put(kmerseq.encode('ascii'), '0'.encode('ascii'), overwrite=True)
+	
+	# Fill in the column environment; note that sequences arent passed in
+	# alphabetical order so we will have to initialize the index to 0 and
+	# update it later.
+	with colenv.begin(write=True) as txn:
+		sequences={}
+		# Walk through the master fasta file and keep track of the sequences
+		# which we've already seen
+		for seq_record in SeqIO.parse("master_fasta.fa", "fasta"):
+			sequence = str(seq_record.seq).upper()
+        	# If we haven't seen the sequence before, put it in the database
+			if sequence not in sequences:
+				sequences[sequence] = seq_record.id
+				txn.put(sequence.encode('ascii'), '0'.encode('ascii'), overwrite=True)		
 
 	# After all sequences have been inserted in alphabetical order, assign their index
-	with colenv.begin(write=True) as txn:
 		cursor = txn.cursor()
 		for (index,(seq, value)) in enumerate(cursor):
 			seq = seq.decode('utf-8')
 			index = str(index)
 			txn.put(seq.encode('ascii'), index.encode('ascii'), overwrite=True)
+
 
 def create_matrix(rowenv,colenv):
 
@@ -92,7 +100,6 @@ def create_matrix(rowenv,colenv):
 		kmermatrix[rowindex,:] = content
 		
 	# Save the matrix
-	print(kmermatrix)
 	np.save('kmermatrix.npy', kmermatrix)
 
 
@@ -111,7 +118,3 @@ if __name__ == "__main__":
 
 	#print_env(rowenv)
 	#print_env(colenv)
-
-
-
-

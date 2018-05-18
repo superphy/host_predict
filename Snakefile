@@ -23,9 +23,18 @@ rule fa_dump:
     "jellyfish dump {input} > {output}"
 
 
-rule make_master: 
+rule fa_master: 
   input:
     expand("results/{id}.fa", id=ids)
+  output:
+    touch("master_fasta.fa")
+  shell:
+   "cat results/*.fa* > master_fasta.fa"
+
+
+rule make_master: 
+  input:
+    "master_fasta.fa"
   output:
     touch("touchfile.txt")
   shell:
