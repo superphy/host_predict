@@ -38,6 +38,6 @@ rule make_master:
   output:
     touch("touchfile.txt")
   shell:
-   "python createmaster.py --threads {threads} {input}"
+   "python createmaster.py {input}"
 
 

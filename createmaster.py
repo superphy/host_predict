@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from Bio import SeqIO
-from pathlib import *
+from pathlib import Path
 import numpy as np
 import os
 import sys
@@ -31,7 +31,18 @@ def create_master(rowenv,colenv):
 	# For each fasta file in the results
 	for filename in p.iterdir():
 		# Get the genomeid from the filepath
-		genomeid = os.path.basename(filename)
+
+		genomeid = filename.name
+
+		#genomeid = str(filename)
+		#genomeid = filename.split('/')[2] # Get filename.fa
+		#genomeid = genomeid.split('.')[0] # Get filename
+
+
+
+
+
+
 		# Fill in the row environment.
 		with rowenv.begin(write=True) as txn:
 			# key = GenomeID & value = row index; note that files
@@ -75,7 +86,7 @@ def create_matrix(rowenv,colenv):
 	p = Path('./results')
 	for filename in p.iterdir():
 		# Get the genomeid from the filepath
-		genomeid = os.path.basename(filename)
+		genomeid = filename.name
 
 		# Using the genome ID, lookup the row# using rowenv.
 		with rowenv.begin() as txn:
