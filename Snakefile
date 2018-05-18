@@ -9,8 +9,10 @@ rule kmer_count:
     "genomes/{id}.fasta"
   output:
     temp("results/{id}.jf")
+  threads:
+    2
   shell:
-    "jellyfish count -m 11 -s 100M {input} -o {output}"
+    "jellyfish count -m 11 -s 100M -t {threads} {input} -o {output}"
 
 rule fa_dump:
   input:
@@ -27,6 +29,6 @@ rule make_master:
   output:
     touch("touchfile.txt")
   shell:
-   "python createmaster.py {input}"
+   "python createmaster.py --threads {threads} {input}"
 
 

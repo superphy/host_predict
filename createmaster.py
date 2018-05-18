@@ -2,6 +2,7 @@
 
 from Bio import SeqIO
 from pathlib import *
+import numpy as np
 import os
 import sys
 import lmdb
@@ -21,23 +22,13 @@ def print_env(env):
 	print(env.stat())
 	
 
-if __name__ == "__main__":
-	"""
-	Makes two environments for col and row lookup.
-	Col stores kmer sequence and column number.
-	Row stores genome ID and row number.
-	"""
-	# Create environments
-	colenv = lmdb.Environment(b'coldb', max_dbs=100, map_size=5000000000)
-	rowenv = lmdb.Environment(b'rowdb', max_dbs=100, map_size=5000000000)
-
+def create_master(rowenv,colenv):
 	p = Path('./results')
+	rowindex = 0
 	for filename in p.iterdir():
 		# Get the genomeid from the filepath
 		genomeid = os.path.basename(filename)
 
-
-		rowindex = 0
 		# Fill in the row environment.
 		with rowenv.begin(write=True) as txn:
 			# key = GenomeID & value = row index
@@ -64,16 +55,59 @@ if __name__ == "__main__":
 			index = str(index)
 			txn.put(seq.encode('ascii'), index.encode('ascii'), overwrite=True)
 
-'''
-	# Initialize the kmermatrix
+def create_matrix(rowenv,colenv):
+
 	numrows = rowenv.stat()['entries']
 	numrows = int(numrows)
 	numcols = colenv.stat()['entries']
 	numcols = int(numcols)
 
 	kmermatrix = np.zeros((numrows,numcols))
+
+	p = Path('./results')
+	for filename in p.iterdir():
+		# Get the genomeid from the filepath
+		genomeid = os.path.basename(filename)
+
+		# Using the genome ID, lookup the row# using rowenv.
+		with rowenv.begin() as txn:
+			rowindex = txn.get(genomeid.encode('ascii'))
+			rowindex = rowindex.decode('utf-8')
+			rowindex = int(rowindex)
+
+		content = [0]*numcols
+		with colenv.begin() as txn:
+			for record in SeqIO.parse(filename, "fasta"):
+				kmercount = record.id
+				kmercount = int(kmercount)
+
+				kmerseq = record.seq
+				kmerseq = kmerseq._get_seq_str_and_check_alphabet(kmerseq)	
+
+				colindex = txn.get(kmerseq.encode('ascii'))
+				colindex = colindex.decode('utf-8')
+				colindex = int(colindex)
+
+				content[colindex] = kmercount
+		kmermatrix[rowindex,:] = content
+		
+	# Save the matrix
+	print(kmermatrix)
 	np.save('kmermatrix.npy', kmermatrix)
-'''
+
+
+if __name__ == "__main__":
+	"""
+	Makes two environments for col and row lookup.
+	Col stores kmer sequence and column number.
+	Row stores genome ID and row number.
+	"""
+	# Create environments
+	colenv = lmdb.Environment(b'coldb', max_dbs=1, map_size=5000000000)
+	rowenv = lmdb.Environment(b'rowdb', max_dbs=1, map_size=5000000000)
+
+	create_master(rowenv,colenv)
+	create_matrix(rowenv,colenv)
 
 	#print_env(rowenv)
 	#print_env(colenv)
