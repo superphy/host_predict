@@ -4,6 +4,12 @@ rule all:
   input:
     "touchfile.txt"
 
+rule clean_input:
+  output:
+    "genomes/{id}.fasta"
+  shell:
+    "python clean.py ../SSRminiTest/genomes genomes/"
+
 rule kmer_count:
   input:
     "genomes/{id}.fasta"
