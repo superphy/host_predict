@@ -38,7 +38,8 @@ def format_files(files_list, output_dir):
 
     for f in files_list:
         file_name = f
-        with open(os.path.join(output_dir, file_name), "w") as oh:
+        #with open(os.path.join(output_dir, file_name), "w") as oh:
+        with open(os.path.join(output_dir, file_name.split('/')[2]), "w") as oh:
             contig_number = 1
             with open(f, "r") as fh:
                 for record in SeqIO.parse(fh, "fasta"):

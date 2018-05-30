@@ -44,7 +44,7 @@ p = Path('./results')
 row_index = 0
 for filename in p.iterdir():
 
-	if row_index%500==0: print("row milestone: ",row_index)
+	if row_index%100==0: print("row milestone: ",row_index)
 
 	# Get the genomeid from the filepath
 	genomeid = filename.name
