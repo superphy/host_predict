@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 import os
 import sys
-import lmdb
 import itertools
 
 
@@ -18,6 +17,7 @@ track of row and column names & their indices.
 ## Input your values here
 num_input_genomes = 2552 # Set this to your number of input files
 kmer_size = 11 			 # Set this to your kmer length
+# To change the data type of the matrix, refer to line 29
 #################################################################
 
 print("starting create matrix")
@@ -81,5 +81,5 @@ print("ending create matrix\n")
 if not os.path.exists('./unfiltered'):
 	os.mkdir('unfiltered')
 np.save('unfiltered/kmer_matrix.npy', kmer_matrix)
-np.save('unfiltered/kmer_rows.npy', row_names)
-np.save('unfiltered/kmer_cols.npy', col_names)
+np.save('unfiltered/dict_kmer_rows.npy', row_names)
+np.save('unfiltered/dict_kmer_cols.npy', col_names)

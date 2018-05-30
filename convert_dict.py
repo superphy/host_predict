@@ -21,24 +21,22 @@ num_rows = np.shape(matrix)[0]
 num_cols = np.shape(matrix)[1]
 
 # Load the dictionaries
-kmer_rows = np.load("unfiltered/kmer_rows.npy")
-kmer_cols = np.load("unfiltered/kmer_cols.npy")
+kmer_rows = np.load("unfiltered/dict_kmer_rows.npy")
+kmer_cols = np.load("unfiltered/dict_kmer_cols.npy")
 
 # Prepare the new np arrays
 row_names = np.empty([num_rows], dtype='S11')
 col_names = np.empty([num_cols], dtype='S11')	
 
 # Walk through row dictionary, place genome in correct index
-i = 0
 for key in kmer_rows.item():
-	row_names[i] = key
-	i+=1
+	index = kmer_rows.item()[key]
+	row_names[index] = key
 
 # Walk through col dictionary, place sequence in correct index
-j=0
 for key in kmer_cols.item():
-	col_names[j] = key
-	j+=1
+	index = kmer_cols.item()[key]
+	col_names[index] = key
 
 print("ending conversion\n")
 

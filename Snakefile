@@ -1,18 +1,12 @@
-ids, = glob_wildcards("genomes/{id}.fasta")
+ids, = glob_wildcards("../SSRminiTest/filtered/genomes/{id}.fasta")
 
 rule all:
   input:
     "touchfile.txt"
 
-rule clean_input:
-  output:
-    "genomes/{id}.fasta"
-  shell:
-    "python clean.py ../SSRminiTest/genomes genomes/"
-
 rule kmer_count:
   input:
-    "genomes/{id}.fasta"
+    "../SSRminiTest/filtered/genomes/{id}.fasta"
   output:
     temp("results/{id}.jf")
   threads:
@@ -28,6 +22,7 @@ rule fa_dump:
   shell:
     "jellyfish dump {input} > {output}"
 
+
 rule make_matrix: 
   input:
     expand("results/{id}.fa", id=ids)
@@ -37,4 +32,3 @@ rule make_matrix:
     shell("python create_matrix.py {input}")
     shell("python convert_dict.py")
     shell("python filter.py")
-
