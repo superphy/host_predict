@@ -1,6 +1,9 @@
 
-RAW_GENOMES_PATH = "genomes/raw/"
+#################################################################
+RAW_GENOMES_PATH = "genomes/raw/" # Location of the raw genomes
+#RAW_GENOMES_PATH = "/mnt/moria/rylan/phenores_data/raw/genomes/"
 MIC_DATA_FILE = "amr_data/Updated_GenotypicAMR_Master.xlsx"
+#################################################################
 
 ids, = glob_wildcards(RAW_GENOMES_PATH+"{id}.fasta")
 
@@ -12,9 +15,9 @@ rule clean:
   input:
     RAW_GENOMES_PATH
   output:
-    "genomes/clean/{id}.fasta"
+    expand("genomes/clean/{id}.fasta", id=ids)#,
   run:
-    shell("python clean.py {input} genomes/clean")
+    shell("python clean.py {input} genomes/clean/")
 
 rule kmer_count:
   input:

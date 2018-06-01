@@ -13,12 +13,13 @@ Creates a matrix of kmer counts, and two dictionaries to keep
 track of row and column names & their indices.
 """
 
-#################################################################
+#####################################################################
 ## Input your values here
-num_input_genomes = 2552 # Set this to your number of input files
-kmer_size = 11 			 # Set this to your kmer length
-# To change the data type of the matrix, refer to line 29
-#################################################################
+num_input_genomes = 2552 	# Set this to your number of input files.
+kmer_size = 11				# Set this to your kmer length.
+matrix_dtype = 'uint8'		# Set the data type for the matrix.
+							#  ->Note uint8 has max kmercount of 256
+#####################################################################
 
 print("starting create matrix")
 
@@ -26,7 +27,7 @@ num_rows = num_input_genomes
 num_cols = 4**kmer_size
 
 # Initialize the matrix
-kmer_matrix = np.zeros((num_rows,num_cols), dtype='uint16')
+kmer_matrix = np.zeros((num_rows,num_cols), dtype=matrix_dtype)
 
 # Initialize the dictionaries of row and col names
 col_names = {}
