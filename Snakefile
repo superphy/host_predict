@@ -1,8 +1,26 @@
 
 #################################################################
-RAW_GENOMES_PATH = "genomes/raw/" # Location of the raw genomes
+
 #RAW_GENOMES_PATH = "/mnt/moria/rylan/phenores_data/raw/genomes/"
-MIC_DATA_FILE = "amr_data/Updated_GenotypicAMR_Master.xlsx"
+
+# Location of the raw genomes
+RAW_GENOMES_PATH = "genomes/raw/"
+
+# Location of the MIC data file (excel spreadsheet)
+MIC_DATA_FILE = "amr_data/Updated_GenotypicAMR_Master.xlsx" # location of MIC data file
+
+# The number of input genomes. The number of rows must match the
+# nubmer of rows in the MIC data file. The names of the genomes
+# must also be consistent, but need not be in the same order.
+NUM_INPUT_FILES = 2552
+
+# Kmer length that you want to count 
+KMER_SIZE = 11
+
+# Data type of the resulting kmer matrix. Use uint8 if counts are
+# all under 256. Else use uint16 (kmer counts under 65536)
+MATRIX_DTYPE = 'uint8'
+
 #################################################################
 
 ids, = glob_wildcards(RAW_GENOMES_PATH+"{id}.fasta")
@@ -27,7 +45,7 @@ rule kmer_count:
   threads:
     2
   shell:
-    "jellyfish count -m 11 -s 100M -t {threads} {input} -o {output}"
+    "jellyfish count -m {KMER_SIZE} -s 100M -t {threads} {input} -o {output}"
 
 rule fa_dump:
   input:
@@ -43,7 +61,7 @@ rule make_matrix:
   output:
     touch("touchfile.txt")
   run:
-    shell("python create_matrix.py {input}")
+    shell("python create_matrix.py {NUM_INPUT_FILES} {KMER_SIZE} {MATRIX_DTYPE} {input}")
     shell("python convert_dict.py")
     shell("python filter.py")
     shell("python bin_mics.py {MIC_DATA_FILE}")

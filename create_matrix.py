@@ -14,11 +14,11 @@ track of row and column names & their indices.
 """
 
 #####################################################################
-## Input your values here
-num_input_genomes = 2552 	# Set this to your number of input files.
-kmer_size = 11				# Set this to your kmer length.
-matrix_dtype = 'uint8'		# Set the data type for the matrix.
-							#  ->Note uint8 has max kmercount of 256
+## Input values
+num_input_genomes = int(sys.argv[1])	# Set this to your number of input files.
+kmer_size = int(sys.argv[2])			# Set this to your kmer length.
+matrix_dtype = sys.argv[3]				# Set the data type for the matrix.
+										#  ->Note uint8 has max kmercount of 256
 #####################################################################
 
 print("starting create matrix")
@@ -76,6 +76,7 @@ for filename in p.iterdir():
 	kmer_matrix[row_index,:] = temp_row
 	row_index+=1
 
+print(kmer_matrix)
 print("ending create matrix\n")
 
 # Save the matrix and its dictionaries
