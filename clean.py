@@ -32,6 +32,8 @@ def find_recurring_char(record, start, end):
     length = len(record)
     window = end - start
     recur_char = 'X'
+    #this is the density threshold for finding a garbage sequence
+    #0.8 means that 80% of nucleotides must be the same to trigger a cut
     perc_cut = 0.8
     A_count = (record).count("A",start,end)
     T_count = (record).count("T",start,end)
@@ -52,38 +54,40 @@ def find_recurring_char(record, start, end):
 
 def format_files(files_list, output_dir):
     """
-    Print to new directory the re-formatted fasta files.
-    We will remove anything smaller than 500bp, under 5x coverage
+    Print to a new directory the re-formatted fasta files.
+    We will remove anything smaller than 500bp, under 5x coverage,
+    and any sequences of repeating or near repeating bases at the
+    beginning or end of a contig.
     :param files_list: list of fasta files to format headers
     :return: success
     """
     max_score=25
     for f in files_list:
         file_name = f
-        #with open(os.path.join(output_dir, file_name), "w") as oh:
         with open(os.path.join(output_dir, file_name.split('/')[-1]), "w") as oh:
             contig_number = 1
             with open(f, "r") as fh:
-                node_counter = 0
                 for record in SeqIO.parse(fh, "fasta"):
-                    node_counter +=1
                     if len(record.seq) < 500:
-                        #print("Skipping {}, less than 500bp".format(record.id), file=sys.stderr)
+                        print("Skipping {}, less than 500bp".format(record.id), file=sys.stderr)
                         continue
 
                     m = re.search(r"_cov_([\d\.]+)", record.id)
                     if m:
                         if float(m.group(1)) < 5:
-                            #print("Skipping {}, low coverage {}".format(record.id, m.group(1)), file=sys.stderr)
+                            print("Skipping {}, low coverage {}".format(record.id, m.group(1)), file=sys.stderr)
                             continue
-                    #else:
-                        #print("Could not find coverage for {}".format(record.id), file=sys.stderr)
+                    else:
+                        print("Could not find coverage for {}".format(record.id), file=sys.stderr)
                     length = len(record.seq)
-                    str1 = record.seq
-                    #print(record.description)
+                    str = record.seq
+
                     #searching end of file for garbage
                     recur_char ="X"
                     window_size =0
+
+                    #search blocks at the end of the contig for a sequence with a high density of a
+                    #specific nucleotide, if there are no garbage sequences, recur_char will be 'X'
                     for i in range (30,310,20):
                         recur_char = find_recurring_char(record.seq,length-i, length)
                         if(recur_char != 'X'):
@@ -92,19 +96,24 @@ def format_files(files_list, output_dir):
                     if(recur_char !='X'):
                         index = length-window_size+1
                         score = max_score
+                        #until the score hits zero, traverse the string char by char and then change
+                        #the score
                         while(score != 0):
                             index -=1
                             curr_char = record.seq[index]
                             if(curr_char==recur_char and score != max_score):
+                                #if the next char matches the one we saw with increase density, add 1
                                 score+=1
                             elif(curr_char!=recur_char):
+                                #if the next char doesnt match the one with high density, minus 1
                                 score-=1
                             if(score == max_score):
+                                #every time we see a max score we mark everything past that point for deletion
                                 window_size = length - index
-                        str1 = record.seq[0:(length-window_size+1)]
-                        #print("Deleting", length-len(str),"bases from node", node_counter, "in",f)
+                        str = record.seq[0:(length-window_size+1)]
+                        print("Trimming {}, {} bases removed".format(record.id, (length-len(str))))
                     #searching front of file for garbage
-                    length = len(str1)
+                    length = len(str)
                     recur_char ="X"
                     window_size =0
                     for i in range (30,310,20):
@@ -124,12 +133,9 @@ def format_files(files_list, output_dir):
                                 score-=1
                             if(score == max_score):
                                 window_size = index
-                        str1 = record.seq[window_size+1:length-1]
+                        str = record.seq[window_size+1:length-1]
 
-
-                    record.description = record.description+"_filteredlen_"+str(len(str1))
-
-                    record.seq=str1
+                    record.seq=str
                     SeqIO.write(record, oh, "fasta")
 
 
