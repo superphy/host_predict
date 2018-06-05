@@ -10,7 +10,7 @@ into arrays, rows[row_index]=genomeid and cols[col_index]=kmerseq.
 With testing this seemed faster than putting them in an array
 during create_matrix.py.
 """
-print("starting conversion")
+print("start: convert dict to npy")
 
 # Load the matrix to get its dimensions
 # Slow but better than explicitly stating the dimensions
@@ -38,7 +38,7 @@ for key in kmer_cols.item():
 	index = kmer_cols.item()[key]
 	col_names[index] = key
 
-print("ending conversion\n")
+print("end: convert dict to npy")
 
 # Save the np arrays
 np.save('unfiltered/kmer_rows.npy', row_names)

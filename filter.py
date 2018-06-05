@@ -4,7 +4,7 @@ import numpy as np
 from math import floor
 import os
 
-print("starting filter")
+print("start: filter matrix")
 
 # Loaad in the kmermatrix and row and col lookups
 matrix = np.load("unfiltered/kmer_matrix.npy")
@@ -45,7 +45,7 @@ matrix  = matrix[:, delete_this]
 # Apply the mask to the column lookup to sdelete unwanted rows
 kmer_cols = kmer_cols[delete_this]
 
-print("ending filter")
+print("end: filter matrix")
 
 # Save the filtered matrix and its row and column lookups
 if not os.path.exists('./filtered'):

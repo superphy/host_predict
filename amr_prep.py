@@ -21,7 +21,7 @@ kmer_rows = np.load("filtered/filtered_rows.npy")
 
 # For each drug
 for drug in df_cols:
-	print("starting ",drug)
+	print("start: prepping amr data for ",drug)
 
 	# Create a directory for the drugs' data
 	if not os.path.exists('./amr_data/'+drug):
@@ -77,6 +77,6 @@ for drug in df_cols:
 	np.save('amr_data/'+drug+'/kmer_rows_mic.npy', new_kmer_rows)
 	np.save('amr_data/'+drug+'/kmer_cols.npy', kmer_cols)
 
-	print("finished ",drug)
+	print("end: prepping amr data for ",drug)
 
 

@@ -13,7 +13,7 @@ df_cols = df.columns		# Col names are drugs
 
 for drug in df_cols:
 
-	print("preparing train/test data for: ", drug)
+	print("start: making train/test data for ", drug)
 
 	matrix   = np.load('amr_data/'+drug+'/kmer_matrix.npy')
 	rows_gen = np.load('amr_data/'+drug+'/kmer_rows_genomes.npy')
@@ -42,18 +42,23 @@ for drug in df_cols:
 	test_mask_b = [1]*test_size
 	test_mask   = test_mask + test_mask_b
 
+
 	# Make data sets
 	train_list = [bool(x) for x in train_mask]
 	test_list  = [bool(x) for x in test_mask]
-	train_list  = np.array(train_list)
-	test_list   = np.array(test_list)
+	#train_list  = np.array(train_list)
+	#test_list   = np.array(test_list)
 
 	#print(rows_mic.shape, len(train_mask))
 
-	train_data  = matrix[train_mask, :]
-	train_names = rows_mic[train_mask]
-	test_data   = matrix[test_mask, :]
-	test_names  = rows_mic[test_mask]
+	train_data  = matrix[train_list, :]
+	train_names = rows_mic[train_list]
+	test_data   = matrix[test_list, :]
+	test_names  = rows_mic[test_list]
+
+	print(matrix.shape)
+	print(train_data.shape)
+	print(test_data.shape)
 
 	#print(test_names)
 	#print(test_data)
@@ -66,4 +71,4 @@ for drug in df_cols:
 	np.save('amr_data/'+drug+'/test_data.npy', test_data)
 	np.save('amr_data/'+drug+'/test_names.npy', test_names)
 
-	print("finished ",drug)
+	print("end: making train/test data for ",drug)
