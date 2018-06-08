@@ -35,6 +35,10 @@ def get_files_to_analyze(file_or_directory):
 
 
 def make_row(filename):
+    """
+    Given a genome file, create and return a row of kmer counts
+    to be inerted into the mer matrix.
+    """
     # Filepath
     thefile = str(filename[0])
 
@@ -61,7 +65,6 @@ def make_row(filename):
         # Put the kmercount in the right spot in the row
         temp_row[col_index] = kmercount
 
-
     return genomeid,temp_row
 
 
@@ -77,7 +80,8 @@ if __name__ == "__main__":
     num_input_genomes = int(sys.argv[1])    # Set this to your number of input files.
     kmer_size = int(sys.argv[2])            # Set this to your kmer length.
     matrix_dtype = sys.argv[3]              # Set the data type for the matrix.
-                                            #  ->Note uint8 has max kmercount of 256                               
+                                            #  ->Note uint8 has max kmercount of 256  
+    results_path = str(sys.argv[4])                             
     #####################################################################
     
     # Initialize the kmer matrix
@@ -97,7 +101,7 @@ if __name__ == "__main__":
         i += 1
 
     # Get a list of all files and reshape it to use with concurrent futures
-    files = get_files_to_analyze("results/")
+    files = get_files_to_analyze(results_path)
     x = np.asarray(files)
     y = x.reshape((len(x),1))
 
@@ -110,9 +114,9 @@ if __name__ == "__main__":
             kmer_matrix[row_index,:] = temp_row
             row_index += 1
 
-    #print(kmer_matrix)
-    #print(kmer_matrix.shape)
-
+    # Save the matrix and its dictionaries
+    if not os.path.exists('./unfiltered'):
+        os.mkdir('unfiltered')
     np.save('unfiltered/kmer_matrix.npy', kmer_matrix)
     np.save('unfiltered/dict_kmer_rows.npy', row_names)
     np.save('unfiltered/dict_kmer_cols.npy', col_names)

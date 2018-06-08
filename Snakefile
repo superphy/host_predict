@@ -2,8 +2,8 @@
 #################################################################
 
 # Location of the raw genomes
-RAW_GENOMES_PATH = "/mnt/moria/rylan/phenores_data/raw/genomes/"
-#RAW_GENOMES_PATH = "genomes/raw/"
+#RAW_GENOMES_PATH = "/mnt/moria/rylan/phenores_data/raw/genomes/"
+RAW_GENOMES_PATH = "genomes/raw/"
 
 # Location of the MIC data file (excel spreadsheet)
 MIC_DATA_FILE = "amr_data/Updated_GenotypicAMR_Master.xlsx" # location of MIC data file
@@ -28,17 +28,16 @@ rule all:
   input:
     "touchfile.txt"
 
-#rule clean:
-#  input:
-#    RAW_GENOMES_PATH
-#  output:
-#    "genomes/clean/{id}.fasta"
-#  run:
-#    shell("python clean.py {input} genomes/clean/")
+rule clean:
+  input:
+    RAW_GENOMES_PATH
+  output:
+    "genomes/clean/{id}.fasta"
+  run:
+    shell("python clean.py {input} genomes/clean/")
 
 rule kmer_count:
   input:
-    #expand("genomes/clean/{id}.fasta", id=ids)
     "genomes/clean/{id}.fasta"
   output:
     temp("results/{id}.jf")
@@ -61,10 +60,9 @@ rule make_matrix:
   output:
     touch("touchfile.txt")
   run:
-    #shell("python tally.py")
-    shell("python parallel_matrix.py {NUM_INPUT_FILES} {KMER_SIZE} {MATRIX_DTYPE} {input}")
+    shell("python parallel_matrix.py {NUM_INPUT_FILES} {KMER_SIZE} {MATRIX_DTYPE} results/")
     shell("python convert_dict.py")
-    shell("python filter.py")
     shell("python bin_mics.py {MIC_DATA_FILE}")
+    shell("python filter.py")
     shell("python amr_prep.py")
     shell("python amr_split.py")

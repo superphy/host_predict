@@ -50,12 +50,14 @@ for drug in df_cols:
 			mask[i] = 0
 	bool_mask = [bool(x) for x in mask]
 
+	#print(kmer_matrix.shape)
+	#print(len(bool_mask))
+
 	print(kmer_matrix.shape)
-	print(len(bool_mask))
-
-
 	new_kmer_matrix = kmer_matrix[bool_mask, :]
 	new_kmer_rows   = kmer_rows[bool_mask]
+	print(new_kmer_matrix.shape)
+
 
 	#print(df)
 	#print(num_rows)

@@ -10,6 +10,7 @@ import os
 import logging
 import numpy as np
 import pandas as pd
+import sys
 
 from dotenv import find_dotenv, load_dotenv
 from sklearn.externals import joblib
@@ -167,5 +168,8 @@ if __name__ == '__main__':
     project_dir = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)
     load_dotenv(find_dotenv())
 
-    main(snakemake.input[0])
+    #main(snakemake.input[0])
+    #print(snakemake.input[0])
+    #print(sys.argv[1])
+    main(sys.argv[1])
     #main('amr_data/Updated_GenotypicAMR_Master.xlsx')

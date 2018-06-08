@@ -26,7 +26,7 @@ delete_this = [1]*num_cols
 # Walk through the columns
 col_index = 0
 while col_index < num_cols:
-	if col_index%500000 == 0: print("col milestone: ", col_index)
+	if col_index%100000 == 0: print("col milestone: ", col_index)
 	# Count the number of empty spots in the column
 	empty_count = np.bincount(matrix[:,col_index])[0]
 	# Calculate the number of filled spots in the column
@@ -39,13 +39,13 @@ while col_index < num_cols:
 delete_this = [bool(x) for x in delete_this]
 delete_this = np.array(delete_this)
 
+print(matrix.shape)
 # Apply the mask to the matrix to delete unwanted rows
 matrix  = matrix[:, delete_this]
+print(matrix.shape)
 
 # Apply the mask to the column lookup to sdelete unwanted rows
 kmer_cols = kmer_cols[delete_this]
-
-print("end: filter matrix")
 
 # Save the filtered matrix and its row and column lookups
 if not os.path.exists('./filtered'):
@@ -53,3 +53,5 @@ if not os.path.exists('./filtered'):
 np.save("filtered/filtered_matrix.npy", matrix)
 np.save("filtered/filtered_cols.npy", kmer_cols)
 np.save("filtered/filtered_rows.npy", kmer_rows)
+
+print("end: filter matrix")
