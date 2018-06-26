@@ -6,12 +6,12 @@
 RAW_GENOMES_PATH = "genomes/raw/"
 
 # Location of the MIC data file (excel spreadsheet)
-MIC_DATA_FILE = "amr_data/Updated_GenotypicAMR_Master.xlsx" # location of MIC data file
+MIC_DATA_FILE = "amr_data/no_ecoli_GenotypicAMR_Master.xlsx" # location of MIC data file
 
 # The number of input genomes. The number of rows must match the
 # nubmer of rows in the MIC data file. The names of the genomes
 # must also be consistent, but need not be in the same order.
-NUM_INPUT_FILES = 2552
+NUM_INPUT_FILES = 2260
 
 # Kmer length that you want to count 
 KMER_SIZE = 11
@@ -30,7 +30,7 @@ rule all:
 
 rule clean:
   input:
-    RAW_GENOMES_PATH
+    RAW_GENOMES_PATH+"{id}.fasta"
   output:
     "genomes/clean/{id}.fasta"
   run:
@@ -65,4 +65,3 @@ rule make_matrix:
     shell("python bin_mics.py {MIC_DATA_FILE}")
     shell("python filter.py")
     shell("python amr_prep.py")
-    shell("python amr_split.py")
