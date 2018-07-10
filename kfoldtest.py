@@ -115,6 +115,8 @@ def eval_model(model, test_data, test_names):
 
 
 if __name__ == "__main__":
+	NUM_FEATS = 10000 # defualt = 270
+
 	df = joblib.load("amr_data/mic_class_dataframe.pkl") # Matrix of experimental MIC values
 	mic_class_dict = joblib.load("amr_data/mic_class_order_dict.pkl") # Matrix of classes for each drug
 
@@ -128,7 +130,7 @@ if __name__ == "__main__":
 		matrix = np.load('amr_data/'+drug+'/kmer_matrix.npy')
 		rows_mic = np.load('amr_data/'+drug+'/kmer_rows_mic.npy')
 
-		X = SelectKBest(f_classif, k=270).fit_transform(matrix, rows_mic)
+		X = SelectKBest(f_classif, k=NUM_FEATS).fit_transform(matrix, rows_mic)
 		Y = rows_mic
 
 		cv = StratifiedKFold(n_splits=5, random_state=913824)
@@ -153,14 +155,37 @@ if __name__ == "__main__":
 			reduce_LR = ReduceLROnPlateau(monitor='loss', factor= 0.1, patience=(patience/2), verbose = 0, min_delta=0.005,mode = 'auto', cooldown=0, min_lr=0)
 
 			model = Sequential()
-			model.add(Dense(270,activation='relu',input_dim=(270)))
+			#model.add(Dense(NUM_FEATS,activation='relu',input_dim=(NUM_FEATS)))
 			#model.add(Dropout(0.5))
 			#model.add(Dense(int((270+num_classes)/2), activation='relu', kernel_initializer='uniform'))
 			#model.add(Dense(40, activation='relu', kernel_initializer='uniform'))
 			#model.add(Dropout(0.5))
+			#model.add(Dense(num_classes, kernel_initializer='uniform', activation='softmax'))
+
+			model.add(Dense(x_train.shape[1],activation='relu',input_dim=(x_train.shape[1])))
+			'''
+			model.add(Dropout({{uniform(0,1)}}))
+			num_layers = {{choice(['zero', 'one', 'two', 'three', 'four', 'five'])}}
+			if ((num_layers == 'one') or (num_layers == 'two') or (num_layers == 'three') or (num_layers == 'four') or (num_layers == 'five')):
+				model.add(Dense(int({{uniform(num_classes,x_train.shape[1])}})))
+				model.add(Dropout({{uniform(0,1)}}))
+			if ((num_layers == 'two') or (num_layers == 'three') or (num_layers == 'four') or (num_layers == 'five')):
+				model.add(Dense(int({{uniform(num_classes,x_train.shape[1])}})))
+				model.add(Dropout({{uniform(0,1)}}))
+			if ((num_layers == 'three') or (num_layers == 'four') or (num_layers == 'five')):
+				model.add(Dense(int({{uniform(num_classes,x_train.shape[1])}})))
+				model.add(Dropout({{uniform(0,1)}}))
+			if ((num_layers == 'four') or (num_layers == 'five')):
+				model.add(Dense(int({{uniform(num_classes,x_train.shape[1])}})))
+				model.add(Dropout({{uniform(0,1)}}))
+			if (num_layers == 'five'):
+				model.add(Dense(int({{uniform(num_classes,x_train.shape[1])}})))
+				model.add(Dropout({{uniform(0,1)}}))
+			'''
 			model.add(Dense(num_classes, kernel_initializer='uniform', activation='softmax'))
+
 			model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
-			model.fit(x_train, y_train, epochs=50, verbose=0, callbacks=[early_stop, reduce_LR])
+			model.fit(x_train, y_train, epochs=100, verbose=0, callbacks=[early_stop, reduce_LR])
 
 			scores = model.evaluate(x_test, y_test, verbose=0)
 
@@ -231,7 +256,7 @@ if __name__ == "__main__":
 		np.save('amr_data/'+drug+'/all_results.npy', all_results)
 		#########################################################################
 
-
+		break
 
 #	best_run, best_model = optim.minimize(model=create_model, data=data, algo=tpe.suggest, max_evals=100, trials=Trials())#
 #	score = best_model.evaluate(test_data, test_names)
